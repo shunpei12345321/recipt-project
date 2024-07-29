@@ -32,6 +32,18 @@ export default function Home() {
 		setReload(!reload);
 	};
 
+	const addCustomer = async () => {
+		const res = await fetch("/api/customer", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ name, email }),
+		});
+		const newCustomer = await res.json();
+		setCustomers([...customers, newCustomer]);
+	};
+
 	return (
 		<div>
 			<div className="flex justify-between  mb-5">
@@ -68,6 +80,7 @@ export default function Home() {
 				value={email}
 				onChange={(e) => setEmail(e.target.value)}
 			/>
+			<button onClick={addCustomer}>Add Customer</button>
 			{/* <button onClick={addCustomer}>Add Customer</button> */}
 		</div>
 	);
