@@ -13,6 +13,7 @@ export default function Home() {
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	// const router = useRouter();
+
 	// const [reload, setReload] = useState(false);
 	// const [isLoading, setIsLoading] = useState(false);
 
@@ -46,9 +47,7 @@ export default function Home() {
 	};
 
 	// const viewReceipts = (customer_id: number) => {
-	// 	router.push(`/receipts/${customer_id}`);
-	// };
-	//--------リンク先がないため--------
+	// router.push(`/receipts/${customer_id}`);
 
 	return (
 		<div>
@@ -76,7 +75,6 @@ export default function Home() {
 						{/* <button onClick={() => viewReceipts(customer.customer_id)}>
 							View Receipts
 						</button> */}
-						<button>View Receipts</button>
 					</li>
 				))}
 			</ul>
@@ -94,6 +92,12 @@ export default function Home() {
 				onChange={(e) => setEmail(e.target.value)}
 			/>
 			<button onClick={addCustomer}>Add Customer</button>
+
+			<Link
+				className="px-5 py-1 border-2 rounded-lg text-green-800 border-green-700 bg-green-100"
+				href="/receipts">
+				新しい投稿
+			</Link>
 		</div>
 	);
 }

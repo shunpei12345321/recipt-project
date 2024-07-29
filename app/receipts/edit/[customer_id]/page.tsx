@@ -42,6 +42,7 @@ export default function ReceiptDetails() {
 							</li>
 						))}
 					</ul>
+					<Link href="/">[ホームに戻る]</Link>
 				</div>
 			))}
 		</div>

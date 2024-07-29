@@ -2,8 +2,13 @@ import { NextResponse } from "next/server";
 
 import prisma from "@/lib/PrismaClient";
 
-export const GET = async (req: Request, { params }) => {
-	const customer_id = parseInt(params.customer_id as string);
+export const GET = async (
+	req: Request,
+	{ params }: { params: { customer_id: string } },
+	//params.customer_idと対応してる（型）
+	res: NextResponse
+) => {
+	const customer_id = parseInt(params.customer_id);
 
 	const receipts = await prisma.receipt.findMany({
 		where: {
