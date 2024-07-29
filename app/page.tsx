@@ -23,7 +23,7 @@ export default function Home() {
 	// 		{
 	// 			const res = await fetch("/api/customer/");
 	// 			const customers = await res.json();
-	// 			setCustomers(customers);
+	// 			setCustomeSrs(customers);
 	// 		}
 	// 		setIsLoading(false);
 	// 	};
@@ -43,7 +43,9 @@ export default function Home() {
 			body: JSON.stringify({ name, email }),
 		});
 		const newCustomer = await res.json();
-		setCustomers([...customers, newCustomer]);
+		setCustomers([newCustomer]);
+
+		// setCustomers([...customers, newCustomer]);
 	};
 
 	// const viewReceipts = (customer_id: number) => {
