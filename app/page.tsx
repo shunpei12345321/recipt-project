@@ -1,76 +1,101 @@
 "use client";
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Customer } from "@prisma/client";
-import { useRouter } from "next/navigation";
 
-// ここのtypeは別フォルダーに入れて　インポートさせる
+interface Receipt {
+	receipt_id: number;
+	customer: {
+		name: string;
+	} | null;
+	details: {
+		product: {
+			product_name: string;
+		} | null;
+		quantity: number;
+	}[];
+}
 
-export default function Home() {
-	const [customers, setCustomers] = useState<Customer[]>([]);
-	const [name, setName] = useState("");
-	const [email, setEmail] = useState("");
-	const [isFetching, setIsFetching] = useState(false);
-	const router = useRouter();
+export default function ReceiptsPage() {
+	const [receipts, setReceipts] = useState<Receipt[]>([]);
+	const [newReceipt, setNewReceipt] = useState({
+		customer_id: "",
+		receipt_date: "",
+		details: [
+			{
+				product_id: "",
+				quantity: 1,
+				total_price: 0,
+			},
+		],
+	});
 
 	useEffect(() => {
-		fetch("/api/customer")
-			.then((res) => res.json())
-			.then((data) => setCustomers(data));
+		async function fetchData() {
+			const response = await fetch("/api/receipts");
+			const data = await response.json();
+			setReceipts(data);
+		}
+		fetchData();
 	}, []);
 
-	const addCustomer = async () => {
-		const res = await fetch("/api/customer", {
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		const response = await fetch("/api/receipts", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
 			},
-			body: JSON.stringify({ name, email }),
+			body: JSON.stringify(newReceipt),
 		});
-		const newCustomer = await res.json();
-		setCustomers([...customers, newCustomer]);
-	};
 
-	const viewReceipts = (customer_id: number) => {
-		router.push(`/receipts/${customer_id}`);
+		const data = await response.json();
+		setReceipts((prev) => [...prev, data]);
 	};
 
 	return (
-		<div>
-			<div className="flex justify-between  mb-5">
-				<p className="text-center  pr-3 mr-3 font-bold text-5xl">111</p>
-			</div>
-			<h1>Customers</h1>
-			<ul>
-				{customers.map((customer) => (
-					<li key={customer.customer_id}>
-						{customer.name} ({customer.email})
-						<button onClick={() => viewReceipts(customer.customer_id)}>
-							View Receipts
-						</button>
-					</li>
-				))}
-			</ul>
-			<h1>Name</h1>
-			<input
-				type="text"
-				placeholder="Name"
-				value={name}
-				onChange={(e) => setName(e.target.value)}
-			/>
-			<input
-				type="email"
-				placeholder="Email"
-				value={email}
-				onChange={(e) => setEmail(e.target.value)}
-			/>
-			<button onClick={addCustomer}>Add Customer</button>
-
-			<Link
-				className="px-5 py-1 border-2 rounded-lg text-green-800 border-green-700 bg-green-100"
-				href="/receipts">
-				新しい投稿
-			</Link>
+		<div className="container mx-auto">
+			<h1 className="text-2xl font-bold mb-4">Receipts</h1>
+			<form onSubmit={handleSubmit} className="mb-4">
+				<input
+					type="text"
+					placeholder="Customer ID"
+					value={newReceipt.customer_id}
+					onChange={(e) =>
+						setNewReceipt({ ...newReceipt, customer_id: e.target.value })
+					}
+					className="border p-2 rounded mr-2"
+				/>
+				<input
+					type="date"
+					value={newReceipt.receipt_date}
+					onChange={(e) =>
+						setNewReceipt({ ...newReceipt, receipt_date: e.target.value })
+					}
+					className="border p-2 rounded mr-2"
+				/>
+				{/* 追加の詳細入力フォームをここに追加 */}
+				<button type="submit" className="bg-blue-500 text-white p-2 rounded">
+					Add Receipt
+				</button>
+			</form>
+			{receipts.map((receipt) => (
+				<div key={receipt.receipt_id} className="mb-4 p-4 border rounded-lg">
+					<h2 className="text-xl font-semibold">
+						{receipt.customer ? receipt.customer.name : "Unknown Customer"}
+					</h2>
+					<ul>
+						{receipt.details.map((detail, index) => (
+							<li key={index} className="ml-4 list-disc">
+								<span>
+									{detail.product
+										? detail.product.product_name
+										: "Unknown Product"}{" "}
+									- Quantity: {detail.quantity}
+								</span>
+							</li>
+						))}
+					</ul>
+				</div>
+			))}
 		</div>
 	);
 }
