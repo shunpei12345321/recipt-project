@@ -2,9 +2,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Customer } from "@prisma/client";
-// import { useRouter } from "next/router";
-
-Link;
+import { useRouter } from "next/navigation";
 
 // ここのtypeは別フォルダーに入れて　インポートさせる
 
@@ -12,71 +10,44 @@ export default function Home() {
 	const [customers, setCustomers] = useState<Customer[]>([]);
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
-	// const router = useRouter();
+	const [isFetching, setIsFetching] = useState(false);
+	const router = useRouter();
 
-	// const [reload, setReload] = useState(false);
-	// const [isLoading, setIsLoading] = useState(false);
-
-	// useEffect(() => {
-	// 	const fetchCustomer = async () => {
-	// 		setIsLoading(true);
-	// 		{
-	// 			const res = await fetch("/api/customer/");
-	// 			const customers = await res.json();
-	// 			setCustomeSrs(customers);
-	// 		}
-	// 		setIsLoading(false);
-	// 	};
-	// 	fetchCustomer();
-	// }, [reload]);
-
-	// const handleReload = () => {
-	// 	setReload(!reload);
-	// };
+	useEffect(() => {
+		fetch("/api/customer")
+			.then((res) => res.json())
+			.then((data) => setCustomers(data));
+	}, []);
 
 	const addCustomer = async () => {
 		const res = await fetch("/api/customer", {
 			method: "POST",
-			// headers: {
-			// 	"Content-Type": "application/json",
-			// },
+			headers: {
+				"Content-Type": "application/json",
+			},
 			body: JSON.stringify({ name, email }),
 		});
 		const newCustomer = await res.json();
-		setCustomers([newCustomer]);
-
-		// setCustomers([...customers, newCustomer]);
+		setCustomers([...customers, newCustomer]);
 	};
 
-	// const viewReceipts = (customer_id: number) => {
-	// router.push(`/receipts/${customer_id}`);
+	const viewReceipts = (customer_id: number) => {
+		router.push(`/receipts/${customer_id}`);
+	};
 
 	return (
 		<div>
 			<div className="flex justify-between  mb-5">
 				<p className="text-center  pr-3 mr-3 font-bold text-5xl">111</p>
-
-				{/* {isLoading ? (
-					<p>Reloading...</p>
-				) : (
-					<button
-						onClick={handleReload}
-						type="button"
-						className="bg-blue-500 text-white px-2 py-1">
-						Reload
-					</button>
-				)} 
-				 ---------------  //ここはルーターのところ  --------------------
-				 */}
 			</div>
 			<h1>Customers</h1>
 			<ul>
 				{customers.map((customer) => (
 					<li key={customer.customer_id}>
 						{customer.name} ({customer.email})
-						{/* <button onClick={() => viewReceipts(customer.customer_id)}>
+						<button onClick={() => viewReceipts(customer.customer_id)}>
 							View Receipts
-						</button> */}
+						</button>
 					</li>
 				))}
 			</ul>
